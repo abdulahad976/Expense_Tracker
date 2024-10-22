@@ -1,31 +1,46 @@
 import time
+
+
 def add_expense(data):
+    category_list = ['Food', 'Transportation', 'Entertainment', 'Sports', 'Home', 'Others']
+
     while True:
-        category_list = ['Food','Transportation','Entertainment','Sports', 'Home', 'Others']
         try:
             date = get_date_input()
-            # print(type(date))
-            date= time.mktime(date.timetuple())
-            category = input("Enter Category (e.g., Food, Transportation, Entertainment, Sports, Home, Others): ")
-            if not category.capitalize() in category_list:
+            date_timestamp = time.mktime(date.timetuple())
+
+            category = input(
+                "Enter Category (e.g., Food, Transportation, Entertainment, Sports, Home, Others): ").capitalize()
+            if category not in category_list:
                 print("Category not found")
                 return False
+
             amount = int(input("Please input the Amount: "))
-            description = input("Please write a brief Description: ")
             if amount < 0:
                 raise ValueError
+
+            description = input("Please write a brief Description: ")
             break
+
         except ValueError:
             print("Amount should be a positive number")
             print("Please Try Again")
 
-    if date in data:
-        data[date].add({'category': category, 'amount': amount, 'date': date, 'description': description})
+    new_expense = {
+        'category': category,
+        'amount': amount,
+        'date': date_timestamp,
+        'description': description
+    }
+    if isinstance(data, list):
+        data.append(new_expense)
     else:
-        data[date] = {'category': category, 'amount': amount, 'date': date, 'description': description}
-    print(data)
-    print(f"\nExpense added successfully: Spent {amount} on {category} by {date}\n")
+        data = [new_expense]
 
+    print(new_expense)
+    print(f"\nExpense added successfully: Spent {amount} on {category} on {date.strftime('%Y-%m-%d')}\n")
+
+    return data
 
 def view_expense(data):
     if not data:
@@ -37,20 +52,24 @@ def view_expense(data):
     print("      3 - to View Expense by date")
     choice = input("     Enter your Choice: ")
     if choice == '1':
+        print(data)
         print('Date          Expenses             Category                Description')
-        for date, expenses in data.items():
-            total += expenses['amount']
-            print(f"{date:<15} {expenses['amount']}     {expenses['category']:>15}  {expenses['description']:>27}")
+        for key in data:
+            total += int(key['amount'])
+            print(f"{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
         print('-' * 56)
         print(f"\nYour Overall Expense is: {total} \n")
     elif choice == '2':
+        k = 1
+        for key in data:
+            print(f'{k}: {key["category"]}')
+            k += 1
         cat = input("If you want to calculate expense by category then enter category name: ")
         cat_total = 0
-        for key, value in data.items():
-            if value['category'] == cat:
-                cat_total += value['amount']
-            else:
-                print(f"{cat} category is not found")
+        for key in data:
+            if key['category'] == cat.capitalize():
+                cat_total += key['amount']
+
         print(f'Overall Expense of {cat} Category is {cat_total}')
     elif choice == '3':
         print("If you want to calculate expense by Date then enter Date : ")
@@ -58,30 +77,25 @@ def view_expense(data):
         date = time.mktime(date.timetuple())
 
         print('Category          Expenses             Description ')
-        for key, value in data.items():
-            if key == date:
-                print(data[key]['category'],"           ",    data[key]['amount'],"                ",data[key]['description'])
+        for key in data:
+            if key['date'] == date:
+                print(key['category'],"           ",    key['amount'],"                ",key['description'])
 
     else:
         print(" Invalid Choice")
 
-
-
-
-
-
 def delete_expense(data):
     k=1
-    for i,j in data.items():
-        print(f'{k}: {j["category"]}')
+    for key in data:
+        print(f'{k}: {key["category"]}')
         k +=1
     name = input("\nPlease Select a Category which you want to delete: ")
 
-    for key, value in data.items():
-        if value['category'] == name:
+    for key in data:
+        if key['category'] == name.capitalize():
             confirm = input("Press Y to confirm: ")
             if confirm == 'Y' or confirm == 'y':
-                del data[key]
+                data.remove(key)
                 print(f"{name} category is deleted successfully")
             else:
                 print("Not Deleted.")
@@ -92,15 +106,17 @@ def delete_expense(data):
 
 def update_expense(data):
     k=1
-    for i, j in data.items():
-        print(f'{k}: {j["category"]}')
+    for key in data:
+        print(f'{k}: {key["category"]}')
         k += 1
     name = input("Please input the category to update: ")
-    for key, value in data.items():
-        if value['category'] == name:
+    for key in data:
+        if key['category'] == name.capitalize():
             while True:
                 try:
                     date = get_date_input()
+                    date_timestamp = time.mktime(date.timetuple())
+
                     # category = input("Please input the Category (e.g., Food, Transportation, Entertainment): ")
                     amount = int(input("Please input the Amount: "))
                     description = input("Please write a brief Description: ")
@@ -111,27 +127,35 @@ def update_expense(data):
                     print("Amount should be a positive number")
                     print("Please Try Again")
                     print()
-
-            data[key]['amount'] = amount
-            data[key]['description'] = description
-            data[key]['date'] = date
+            key['date'] = date_timestamp
+            key['amount'] = amount
+            key['description'] = description
             break
 
 def readfile(file):
     import os
-    data = {}
-    if os.path.exists(file):
-        with open(file, 'r') as f:
-            for line in f:
-                date,amount,category,description = line.strip().split(',')
-                data[date] = {'amount':int(amount),'category':category,'description':description}
-    return data
+    data = []
 
+    if not os.path.exists(file):
+        return data
+
+    with open(file, 'r') as f:
+        for line in f:
+            date, amount, category, description = line.strip().split(',')
+            lines = {
+                'date': date,
+                'amount': int(amount),
+                'category': category,
+                'description': description
+            }
+            data.append(lines)
+
+    return data
 
 def save_expenses(data, file):
     with open(file, 'w') as myfile:
-        for categories, expenses in data.items():
-            myfile.write(f"{categories},{expenses['amount']},{expenses['category']},{expenses['description']}\n")
+        for categories in data:
+            myfile.write(f"{categories['date']},{categories['amount']},{categories['category']},{categories['description']}\n")
 
 from datetime import datetime
 
@@ -145,6 +169,7 @@ def get_date_input():
             print("Invalid date format. Please use YYYY-MM-DD.")
 
 def main():
+
     file = "abc.csv"
     data = readfile(file)
 

@@ -1,5 +1,4 @@
 import time
-from unicodedata import category
 
 
 def add_expense(data):
@@ -8,7 +7,7 @@ def add_expense(data):
         try:
             date = get_date_input()
             # print(type(date))
-            unixdate= time.mktime(date.timetuple())
+            date= time.mktime(date.timetuple())
             category = input("Enter Category (e.g., Food, Transportation, Entertainment, Sports, Home, Others): ")
             if not category.capitalize() in category_list:
                 print("Category not found")
@@ -31,12 +30,12 @@ def add_expense(data):
     # print(data)
 
     print(f"\nExpense added successfully: Spent {amount} on {category} by {date}\n")
-    if unixdate in data:
-        data['amount'] += amount
-        data['date'] = unixdate
-        data['description'] = description
+    if date in data:
+        data[date]['amount'] += amount
+        data[date]['date'] = date
+        data[date]['description'] = description
     else:
-        data[unixdate] = {'category': category, 'amount': amount, 'date': unixdate, 'description': description}
+        data[date] = {'category': category, 'amount': amount, 'date': date, 'description': description}
     print(data)
     # print(f"\nExpense added successfully: Spent {amount} on {category} by {date}\n")
 
@@ -46,26 +45,42 @@ def view_expense(data):
         print("\nNo Data Found \n ")
         return
     total = 0
-    sports = 0
-    food = 0
-    print('Date          Expenses             Category                Description')
-    for date, expenses in data.items():
-        # if expenses.__getitem__('category') == 'sports':
-        #     sports += expenses.__getitem__('amount')
-        # if expenses.__getitem__('category') == 'food':
-        #     food += expenses.__getitem__('amount')
-        # for i,j in expenses.items():
-        #     print(i,j)
-        total +=  expenses['amount']
-        print(f"{date:<15} {expenses['amount']}     {expenses['category']:>15}  {expenses['description']:>27}")
-    print('-'*56)
-    print(f"\nYour Overall Expense is: {total} \n")
-    cat = input("If you want to calculate expense by category then enter category name: ")
-    cat_total = 0
-    for key, value in data.items():
-        if value['category'] == cat:
-            cat_total += value['amount']
-    print(f'Overall Expense of {cat} Category is {cat_total}')
+    print("      1 - View All Expenses ")
+    print("      2 - to View Expense by Category")
+    print("      3 - to View Expense by date")
+    choice = input("     Enter your Choice: ")
+    if choice == '1':
+        print('Date          Expenses             Category                Description')
+        for date, expenses in data.items():
+            total += expenses['amount']
+            print(f"{date:<15} {expenses['amount']}     {expenses['category']:>15}  {expenses['description']:>27}")
+        print('-' * 56)
+        print(f"\nYour Overall Expense is: {total} \n")
+    elif choice == '2':
+        cat = input("If you want to calculate expense by category then enter category name: ")
+        cat_total = 0
+        for key, value in data.items():
+            if value['category'] == cat:
+                cat_total += value['amount']
+            else:
+                print(f"{cat} category is not found")
+        print(f'Overall Expense of {cat} Category is {cat_total}')
+    elif choice == '3':
+        print("If you want to calculate expense by Date then enter Date : ")
+        date = get_date_input()
+        date = time.mktime(date.timetuple())
+
+        print('Category          Expenses             Description ')
+        for key, value in data.items():
+            if key == date:
+                print(data[key]['category'],"           ",    data[key]['amount'],"                ",data[key]['description'])
+
+    else:
+        print(" Invalid Choice")
+
+
+
+
 
 
 def delete_expense(data):
@@ -118,13 +133,11 @@ def update_expense(data):
 
 def readfile(file):
     import os
-    import ast
     data = {}
     if os.path.exists(file):
         with open(file, 'r') as f:
             for line in f:
                 date,amount,category,description = line.strip().split(',')
-                # data[cat] = ast.literal_eval(amount)
                 data[date] = {'amount':int(amount),'category':category,'description':description}
     return data
 

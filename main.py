@@ -1,6 +1,4 @@
 import time
-
-
 def add_expense(data):
     while True:
         category_list = ['Food','Transportation','Entertainment','Sports', 'Home', 'Others']
@@ -21,23 +19,12 @@ def add_expense(data):
             print("Amount should be a positive number")
             print("Please Try Again")
 
-    # if category in data:
-    #     data[category].append(amount)
-    # else:
-    #     data[category] = [amount]
-
-    # data.update({'category': category, 'amount': [amount], 'description': description})
-    # print(data)
-
-    print(f"\nExpense added successfully: Spent {amount} on {category} by {date}\n")
     if date in data:
-        data[date]['amount'] += amount
-        data[date]['date'] = date
-        data[date]['description'] = description
+        data[date].add({'category': category, 'amount': amount, 'date': date, 'description': description})
     else:
         data[date] = {'category': category, 'amount': amount, 'date': date, 'description': description}
     print(data)
-    # print(f"\nExpense added successfully: Spent {amount} on {category} by {date}\n")
+    print(f"\nExpense added successfully: Spent {amount} on {category} by {date}\n")
 
 
 def view_expense(data):
@@ -84,7 +71,6 @@ def view_expense(data):
 
 
 def delete_expense(data):
-    print(data)
     k=1
     for i,j in data.items():
         print(f'{k}: {j["category"]}')
@@ -98,7 +84,7 @@ def delete_expense(data):
                 del data[key]
                 print(f"{name} category is deleted successfully")
             else:
-                print("Deletion cancelled.")
+                print("Not Deleted.")
             break
     else:
         print("Category not found, Please try again!")

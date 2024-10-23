@@ -6,7 +6,7 @@ def add_expense(data):
 
     while True:
         try:
-            date = get_date_input()
+            date = get_date()
             date_timestamp = time.mktime(date.timetuple())
 
             category = input(
@@ -84,6 +84,32 @@ def view_expense(data):
     else:
         print(" Invalid Choice")
 
+def monthly_expense(data):
+    import calendar
+    from datetime import datetime
+
+    if not data:
+        print("Data not found")
+        return
+
+    month = get_month()
+    year = int(month.strftime("%Y"))
+    months = int(month.strftime("%m"))
+    month_name = month.strftime("%B")
+
+    first = datetime(year,months,1)
+    last = calendar.monthrange(year,months)[1]
+    last = datetime(year,months,last)
+    total = 0
+
+    print('\nDate          Expenses             Category                Description')
+    for key in data:
+        if first.timestamp() < float(key['date']) < last.timestamp():
+            total += float(key['amount'])
+            print(f"{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
+
+    print(f"\nOverall Expenses for {month_name}-{year} is {total} \n")
+
 def delete_expense(data):
     k=1
     for key in data:
@@ -114,7 +140,7 @@ def update_expense(data):
         if key['category'] == name.capitalize():
             while True:
                 try:
-                    date = get_date_input()
+                    date = get_date()
                     date_timestamp = time.mktime(date.timetuple())
 
                     # category = input("Please input the Category (e.g., Food, Transportation, Entertainment): ")
@@ -149,8 +175,10 @@ def readfile(file):
                 'description': description
             }
             data.append(lines)
-
     return data
+
+
+
 
 def save_expenses(data, file):
     with open(file, 'w') as myfile:
@@ -159,12 +187,22 @@ def save_expenses(data, file):
 
 from datetime import datetime
 
-def get_date_input():
+def get_date():
     while True:
         date_string = input("Enter a date (YYYY-MM-DD): ")
         try:
             date = datetime.strptime(date_string, "%Y-%m-%d")
             return date
+        except ValueError:
+            print("Invalid date format. Please use YYYY-MM-DD.")
+
+
+def get_month():
+    while True:
+        month = input("Enter a Year and Month (YYYY-MM): ")
+        try:
+            month = datetime.strptime(month, "%Y-%m")
+            return month
         except ValueError:
             print("Invalid date format. Please use YYYY-MM-DD.")
 
@@ -180,7 +218,8 @@ def main():
         print("      2 - to View Expense ")
         print("      3 - to Delete Expense")
         print("      4 - to Edit/Update Expense")
-        print("      5 - to Save the Expenses")
+        print("      5 - to get monthly report")
+        print("      6 - to Save the Expenses")
         print(" Enter anything to Exit the Program")
         print("---------------------------------------")
 
@@ -194,6 +233,8 @@ def main():
         elif num == '4':
             update_expense(data)
         elif num == '5':
+            monthly_expense(data)
+        elif num == '6':
             save_expenses(data,file)
             print("\nSuccessfully Saved in the Memory\n")
 

@@ -73,7 +73,7 @@ def view_expense(data):
         print(f'Overall Expense of {cat} Category is {cat_total}')
     elif choice == '3':
         print("If you want to calculate expense by Date then enter Date : ")
-        date = get_date_input()
+        date = get_date()
         date = time.mktime(date.timetuple())
 
         print('Category          Expenses             Description ')

@@ -7,8 +7,8 @@ def add_expense(data):
     while True:
         try:
             date = get_date()
-            date_timestamp = time.mktime(date.timetuple())
-
+            # date_timestamp = time.mktime(date.timetuple())
+            date_timestamp = date.timestamp()
             category = input(
                 "Enter Category (e.g., Food, Transportation, Entertainment, Sports, Home, Others): ").capitalize()
             if category not in category_list:
@@ -111,10 +111,10 @@ def monthly_expense(data):
     print(f"\nOverall Expenses for {month_name}-{year} is {total} \n")
 
 def delete_expense(data):
-    k=1
+
+    print('Date          Expenses             Category                Description')
     for key in data:
-        print(f'{k}: {key["category"]}')
-        k +=1
+        print(f"{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
     name = input("\nPlease Select a Category which you want to delete: ")
 
     for key in data:
@@ -131,18 +131,18 @@ def delete_expense(data):
 
 
 def update_expense(data):
-    k=1
+
+    print('Date          Expenses             Category                Description')
     for key in data:
-        print(f'{k}: {key["category"]}')
-        k += 1
+        print(f"{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
     name = input("Please input the category to update: ")
     for key in data:
         if key['category'] == name.capitalize():
             while True:
                 try:
                     date = get_date()
-                    date_timestamp = time.mktime(date.timetuple())
-
+                    # date_timestamp = time.mktime(date.timetuple())
+                    date_timestamp = date.timestamp()
                     # category = input("Please input the Category (e.g., Food, Transportation, Entertainment): ")
                     amount = int(input("Please input the Amount: "))
                     description = input("Please write a brief Description: ")

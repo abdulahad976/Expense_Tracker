@@ -34,15 +34,19 @@ def view_expense(data):
     if choice == '1':
         print('Id          Date          Expenses             Category                Description')
         for key in data:
+            date = key['date']
+            date = datetime.fromtimestamp(date).strftime('%Y-%m-%d')
             total += int(key['amount'])
-            print(f"{key['id']:<12}{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
+            print(f"{key['id']:<12}{date:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
         print('-' *72)
         print(f"\nYour Overall Expense is: {total} \n")
 
     elif choice == '2':
         print('Id          Date          Expenses             Category                Description')
         for key in data:
-            print(f"{key['id']:<12}{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
+            date = key['date']
+            readable_date = datetime.fromtimestamp(date).strftime('%Y-%m-%d')
+            print(f"{key['id']:<12}{readable_date:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
         cat = input("\nIf you want to filter expense by category then enter category name: ")
         cat_total = 0
         print('Id          Date          Expenses             Category                Description')
@@ -56,6 +60,7 @@ def view_expense(data):
         print("If you want to filter expense by Date then enter Date : ")
         date = get_date()
         date = date.timestamp()
+
         print('id          Category          Expenses         Description ')
         for key in data:
             if key['date'] == date:
@@ -84,15 +89,19 @@ def monthly_expense(data):
     print('Id          Date          Expenses             Category                Description')
     for key in data:
         if first.timestamp() <= float(key['date']) <= last.timestamp():
+            date = key['date']
+            date = datetime.fromtimestamp(date).strftime('%Y-%m-%d')
             total += float(key['amount'])
-            print(f"{key['id']:<12}{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
+            print(f"{key['id']:<12}{date:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
 
     print(f"\nOverall Expenses for {month_name}-{year} is {total} \n")
 
 def delete_expense(data):
     print('Id          Date          Expenses             Category                Description')
     for key in data:
-        print(f"{key['id']:<12}{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
+        date = key['date']
+        date = datetime.fromtimestamp(date).strftime('%Y-%m-%d')
+        print(f"{key['id']:<12}{date:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
 
     # id1 = int(input("\nPlease Select an id which you want to delete: "))
     #
@@ -138,7 +147,9 @@ def delete_expense(data):
 def update_expense(data):
     print('Id          Date          Expenses             Category                Description')
     for key in data:
-        print(f"{key['id']:<12}{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
+        date = key['date']
+        date = datetime.fromtimestamp(date).strftime('%Y-%m-%d')
+        print(f"{key['id']:<12}{date:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
 
     # id1 = int(input("Please input the id to update: "))
     try:

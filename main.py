@@ -103,45 +103,27 @@ def delete_expense(data):
         date = datetime.fromtimestamp(date).strftime('%Y-%m-%d')
         print(f"{key['id']:<12}{date:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
 
-    # id1 = int(input("\nPlease Select an id which you want to delete: "))
-    #
-    # for key in data:
-    #     while True:
-    #         try:
-    #             if key['id'] == id1:
-    #                 confirm = input("Press Y to confirm: ")
-    #                 if confirm == 'Y' or confirm == 'y':
-    #                     data.remove(key)
-    #                     print(f"{id1} id is deleted successfully")
-    #                 else:
-    #                     print("Not Deleted.")
-    #             else:
-    #                 raise ValueError
-    #
-    #         except ValueError:
-    #             print(f"{id1} not found please try again")
-    #             break
-    try:
-        id1 = int(input("\nPlease select an id you want to delete: ").strip())
-    except ValueError:
-        print("Invalid input. Please enter a valid integer ID.")
-    else:
+    while True:
+        try:
+            id1 = int(input("\nPlease select an ID you want to delete: ").strip())
+        except ValueError:
+            print("Invalid input. Please enter a valid integer ID.")
+            continue
+
         id_found = False
 
         for key in data:
             if key['id'] == id1:
-                confirm = input("Press Y to confirm: ").strip()
-                if confirm in ('Y', 'y'):
+                confirm = input("Press Y to confirm deletion: ").strip().lower()
+                if confirm == 'y':
                     data.remove(key)
-                    print(f"{id1} id is deleted successfully")
-                else:
-                    print("Not Deleted.")
-                id_found = True
-                break  # Exit the loop after deletion
-
-        # If the id wasn't found, provide feedback
-        if not id_found:
-            print(f"{id1} not found, please try again.")
+                    print(f"ID {id1} has been deleted successfully.")
+                    id_found = True
+                    break
+        if id_found:
+            break
+        else:
+            print(f"ID {id1} not found, please try again.")
 
 
 def update_expense(data):
@@ -151,25 +133,35 @@ def update_expense(data):
         date = datetime.fromtimestamp(date).strftime('%Y-%m-%d')
         print(f"{key['id']:<12}{date:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
 
-    # id1 = int(input("Please input the id to update: "))
-    try:
-        id1 = int(input("\nPlease select an id you want to Update: ").strip())
-    except ValueError:
-        print("Invalid input. Please enter a valid integer ID.")
-    else:
-        for key in data:
-            if key['id'] == id1:
+    while True:
+        try:
+            id1 = int(input("\nPlease select an id you want to Update: ").strip())
+        except ValueError:
+            print("Invalid input. Please enter a valid integer ID.")
+        else:
+            id_found = False
+            for key in data:
+                if key['id'] == id1:
 
-                date = get_date()
-                date_timestamp = date.timestamp()
-                category = get_category()
-                amount = get_amount()
-                description = input("Please write a brief Description: ")
+                    date = get_date()
+                    date_timestamp = date.timestamp()
+                    category = get_category()
+                    amount = get_amount()
+                    description = input("Please write a brief Description: ")
 
-                key['date'] = date_timestamp
-                key['amount'] = amount
-                key['category'] = category
-                key['description'] = description
+                    key['date'] = date_timestamp
+                    key['amount'] = amount
+                    key['category'] = category
+                    key['description'] = description
+
+                    id_found = True
+
+                    print("\n Updated Successfully \n")
+            if id_found:
+                break
+            else:
+                print(f"ID {id1} not found, please try again.")
+
 
 def readfile(file):
     import os

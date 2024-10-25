@@ -1,7 +1,4 @@
-import time
 import random
-from unicodedata import category
-
 
 def add_expense(data):
     date = get_date()
@@ -9,13 +6,13 @@ def add_expense(data):
     category = get_category()
     amount = get_amount()
     description = input("Please write a brief Description: ")
-    myid = random.randint(0,100)
+    id1 = random.randint(0,500)
     new_expense = {
         'category': category,
         'amount': amount,
         'date': date_timestamp,
         'description': description,
-        'id': myid
+        'id': id1
     }
     if isinstance(data, list):
         data.append(new_expense)
@@ -33,6 +30,7 @@ def view_expense(data):
     print("      2 - to View Expense by Category")
     print("      3 - to View Expense by date")
     choice = input("     Enter your Choice: ")
+
     if choice == '1':
         print('Id          Date          Expenses             Category                Description')
         for key in data:
@@ -40,25 +38,24 @@ def view_expense(data):
             print(f"{key['id']:<12}{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
         print('-' *72)
         print(f"\nYour Overall Expense is: {total} \n")
+
     elif choice == '2':
-        k = 1
+        print('Id          Date          Expenses             Category                Description')
         for key in data:
-            print(f'{k}: {key["category"]}')
-            k += 1
-        cat = input("If you want to calculate expense by category then enter category name: ")
+            print(f"{key['id']:<12}{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
+        cat = input("\nIf you want to filter expense by category then enter category name: ")
         cat_total = 0
         print('Id          Date          Expenses             Category                Description')
         for key in data:
             if key['category'] == cat.capitalize():
                 print(f"{key['id']:<12}{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
                 cat_total += key['amount']
-
         print(f'Overall Expense of {cat} Category is {cat_total}')
+
     elif choice == '3':
-        print("If you want to calculate expense by Date then enter Date : ")
+        print("If you want to filter expense by Date then enter Date : ")
         date = get_date()
         date = date.timestamp()
-
         print('id          Category          Expenses         Description ')
         for key in data:
             if key['date'] == date:
@@ -84,7 +81,6 @@ def monthly_expense(data):
     last = calendar.monthrange(year,months)[1]
     last = datetime(year,months,last)
     total = 0
-
     print('Id          Date          Expenses             Category                Description')
     for key in data:
         if first.timestamp() <= float(key['date']) <= last.timestamp():
@@ -98,19 +94,45 @@ def delete_expense(data):
     for key in data:
         print(f"{key['id']:<12}{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
 
-    id = int(input("\nPlease Select an id which you want to delete: "))
-
-    for key in data:
-        if key['id'] == id:
-            confirm = input("Press Y to confirm: ")
-            if confirm == 'Y' or confirm == 'y':
-                data.remove(key)
-                print(f"{id} id is deleted successfully")
-            else:
-                print("Not Deleted.")
-            break
+    # id1 = int(input("\nPlease Select an id which you want to delete: "))
+    #
+    # for key in data:
+    #     while True:
+    #         try:
+    #             if key['id'] == id1:
+    #                 confirm = input("Press Y to confirm: ")
+    #                 if confirm == 'Y' or confirm == 'y':
+    #                     data.remove(key)
+    #                     print(f"{id1} id is deleted successfully")
+    #                 else:
+    #                     print("Not Deleted.")
+    #             else:
+    #                 raise ValueError
+    #
+    #         except ValueError:
+    #             print(f"{id1} not found please try again")
+    #             break
+    try:
+        id1 = int(input("\nPlease select an id you want to delete: ").strip())
+    except ValueError:
+        print("Invalid input. Please enter a valid integer ID.")
     else:
-        print("Id not found, Please try again!")
+        id_found = False
+
+        for key in data:
+            if key['id'] == id1:
+                confirm = input("Press Y to confirm: ").strip()
+                if confirm in ('Y', 'y'):
+                    data.remove(key)
+                    print(f"{id1} id is deleted successfully")
+                else:
+                    print("Not Deleted.")
+                id_found = True
+                break  # Exit the loop after deletion
+
+        # If the id wasn't found, provide feedback
+        if not id_found:
+            print(f"{id1} not found, please try again.")
 
 
 def update_expense(data):
@@ -118,28 +140,25 @@ def update_expense(data):
     for key in data:
         print(f"{key['id']:<12}{key['date']:<15} {key['amount']}     {key['category']:>15}  {key['description']:>27}")
 
-    id = int(input("Please input the category to update: "))
-    for key in data:
-        if key['id'] == id:
-            while True:
-                try:
-                    date = get_date()
-                    date_timestamp = date.timestamp()
-                    category = get_category()
-                    amount = get_amount()
-                    description = input("Please write a brief Description: ")
-                    if amount < 0:
-                        raise ValueError
-                    break
-                except ValueError:
-                    print("Amount should be a positive number")
-                    print("Please Try Again")
-                    print()
-            key['date'] = date_timestamp
-            key['amount'] = amount
-            key['category'] = category
-            key['description'] = description
-            break
+    # id1 = int(input("Please input the id to update: "))
+    try:
+        id1 = int(input("\nPlease select an id you want to Update: ").strip())
+    except ValueError:
+        print("Invalid input. Please enter a valid integer ID.")
+    else:
+        for key in data:
+            if key['id'] == id1:
+
+                date = get_date()
+                date_timestamp = date.timestamp()
+                category = get_category()
+                amount = get_amount()
+                description = input("Please write a brief Description: ")
+
+                key['date'] = date_timestamp
+                key['amount'] = amount
+                key['category'] = category
+                key['description'] = description
 
 def readfile(file):
     import os
@@ -150,10 +169,10 @@ def readfile(file):
 
     with open(file, 'r') as f:
         for line in f:
-            id, date, amount, category, description = line.strip().split(',')
+            id1, date, amount, category, description = line.strip().split(',')
             lines = {
-                'id':int(id),
-                'date': date,
+                'id':int(id1),
+                'date': float(date),
                 'amount': int(amount),
                 'category': category,
                 'description': description
